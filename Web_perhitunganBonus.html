@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kalkulator Bonus Pembelian</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 520px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .header h1 {
+      font-size: 1.7rem;
+      color: #e2e8f0;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .header p {
+      color: #94a3b8;
+      font-size: 0.9rem;
+      margin-top: 6px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px;
+      padding: 32px;
+    }
+
+    .section-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #64748b;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      margin-bottom: 7px;
+      font-weight: 500;
+    }
+
+    input {
+      width: 100%;
+      padding: 11px 14px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      color: #f1f5f9;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    input:focus {
+      border-color: #38bdf8;
+      background: rgba(56,189,248,0.08);
+    }
+
+    input.error {
+      border-color: #f87171;
+      background: rgba(248,113,113,0.08);
+    }
+
+    .error-msg {
+      font-size: 0.78rem;
+      color: #f87171;
+      margin-top: 5px;
+      display: none;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      margin: 22px 0;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s, opacity 0.15s;
+    }
+
+    button:active { transform: scale(0.97); }
+
+    #btnHitung {
+      background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+      color: #0f172a;
+    }
+
+    #btnReset {
+      background: rgba(255,255,255,0.1);
+      color: #cbd5e1;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    #btnReset:hover { background: rgba(255,255,255,0.15); }
+
+    /* Result Table */
+    .result-section {
+      margin-top: 28px;
+      display: none;
+    }
+
+    .result-section.show { display: block; }
+
+    .result-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+
+    .result-table tr {
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .result-table tr:last-child { border-bottom: none; }
+
+    .result-table td {
+      padding: 11px 6px;
+      font-size: 0.9rem;
+      color: #cbd5e1;
+    }
+
+    .result-table td:first-child {
+      color: #94a3b8;
+      width: 50%;
+    }
+
+    .result-table td:last-child {
+      font-weight: 600;
+      color: #f1f5f9;
+      text-align: right;
+    }
+
+    .highlight-row td {
+      color: #38bdf8 !important;
+      font-size: 1rem;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .badge-bonus {
+      background: rgba(34,197,94,0.15);
+      color: #4ade80;
+      border: 1px solid #4ade8040;
+    }
+
+    .badge-none {
+      background: rgba(248,113,113,0.12);
+      color: #f87171;
+      border: 1px solid #f8717140;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🛒 Kalkulator Bonus Pembelian</h1>
+      <p>Hitung total belanja & potongan harga secara otomatis</p>
+    </div>
+
+    <div class="card">
+      <p class="section-title">Form Input</p>
+
+      <div class="form-group">
+        <label for="namaPelanggan">Nama Pelanggan</label>
+        <input type="text" id="namaPelanggan" placeholder="Masukkan nama pelanggan" />
+        <div class="error-msg" id="errNama">Nama pelanggan wajib diisi.</div>
+      </div>
+
+      <div class="form-group">
+        <label for="namaProduk">Nama Produk</label>
+        <input type="text" id="namaProduk" placeholder="Masukkan nama produk" />
+        <div class="error-msg" id="errProduk">Nama produk wajib diisi.</div>
+      </div>
+
+      <div class="form-group">
+        <label for="hargaProduk">Harga Produk (Rp)</label>
+        <input type="number" id="hargaProduk" placeholder="Contoh: 150000" min="0" />
+        <div class="error-msg" id="errHarga">Harga produk wajib diisi dan harus berupa angka.</div>
+      </div>
+
+      <div class="form-group">
+        <label for="jumlahPembelian">Jumlah Pembelian</label>
+        <input type="number" id="jumlahPembelian" placeholder="Contoh: 3" min="1" />
+        <div class="error-msg" id="errJumlah">Jumlah pembelian wajib diisi dan harus berupa angka.</div>
+      </div>
+
+      <hr class="divider" />
+
+      <div class="btn-row">
+        <button id="btnHitung" onclick="hitung()">Hitung</button>
+        <button id="btnReset" onclick="reset()">Reset</button>
+      </div>
+
+      <!-- Hasil -->
+      <div class="result-section" id="hasilSection">
+        <hr class="divider" />
+        <p class="section-title">Hasil Perhitungan</p>
+        <table class="result-table">
+          <tr>
+            <td>Nama Pelanggan</td>
+            <td id="rNama">-</td>
+          </tr>
+          <tr>
+            <td>Nama Produk</td>
+            <td id="rProduk">-</td>
+          </tr>
+          <tr>
+            <td>Total Belanja</td>
+            <td id="rTotalBelanja">-</td>
+          </tr>
+          <tr>
+            <td>Bonus / Potongan</td>
+            <td id="rBonus">-</td>
+          </tr>
+          <tr class="highlight-row">
+            <td>Total Bayar</td>
+            <td id="rTotalBayar">-</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function formatRupiah(angka) {
+      return 'Rp ' + angka.toLocaleString('id-ID');
+    }
+
+    function setError(inputId, errId, show) {
+      const input = document.getElementById(inputId);
+      const err = document.getElementById(errId);
+      if (show) {
+        input.classList.add('error');
+        err.style.display = 'block';
+      } else {
+        input.classList.remove('error');
+        err.style.display = 'none';
+      }
+    }
+
+    function hitung() {
+      const nama = document.getElementById('namaPelanggan').value.trim();
+      const produk = document.getElementById('namaProduk').value.trim();
+      const harga = document.getElementById('hargaProduk').value.trim();
+      const jumlah = document.getElementById('jumlahPembelian').value.trim();
+
+      let valid = true;
+
+      // Validasi
+      setError('namaPelanggan', 'errNama', !nama);
+      if (!nama) valid = false;
+
+      setError('namaProduk', 'errProduk', !produk);
+      if (!produk) valid = false;
+
+      const hargaNum = parseFloat(harga);
+      const hargaInvalid = !harga || isNaN(hargaNum) || hargaNum < 0;
+      setError('hargaProduk', 'errHarga', hargaInvalid);
+      if (hargaInvalid) valid = false;
+
+      const jumlahNum = parseInt(jumlah);
+      const jumlahInvalid = !jumlah || isNaN(jumlahNum) || jumlahNum < 1;
+      setError('jumlahPembelian', 'errJumlah', jumlahInvalid);
+      if (jumlahInvalid) valid = false;
+
+      if (!valid) return;
+
+      // Perhitungan
+      const totalBelanja = hargaNum * jumlahNum;
+      let potongan = 0;
+      let bonusLabel = '';
+
+      if (totalBelanja >= 400000) {
+        potongan = totalBelanja * 0.1; // 10% diskon
+        bonusLabel = `<span class="badge badge-bonus">Diskon 10% — ${formatRupiah(potongan)}</span>`;
+      } else {
+        bonusLabel = `<span class="badge badge-none">Tidak dapat potongan</span>`;
+      }
+
+      const totalBayar = totalBelanja - potongan;
+
+      // Tampilkan hasil
+      document.getElementById('rNama').textContent = nama;
+      document.getElementById('rProduk').textContent = produk;
+      document.getElementById('rTotalBelanja').textContent = formatRupiah(totalBelanja);
+      document.getElementById('rBonus').innerHTML = bonusLabel;
+      document.getElementById('rTotalBayar').textContent = formatRupiah(totalBayar);
+
+      document.getElementById('hasilSection').classList.add('show');
+    }
+
+    function reset() {
+      ['namaPelanggan','namaProduk','hargaProduk','jumlahPembelian'].forEach(id => {
+        document.getElementById(id).value = '';
+        document.getElementById(id).classList.remove('error');
+      });
+      ['errNama','errProduk','errHarga','errJumlah'].forEach(id => {
+        document.getElementById(id).style.display = 'none';
+      });
+      document.getElementById('hasilSection').classList.remove('show');
+    }
+  </script>
+</body>
+</html>
